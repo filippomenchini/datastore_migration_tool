@@ -26,7 +26,7 @@ async function updateRecord(tableName, keyFields, record) {
         console.log("Record updated successfully:", key);
         return { query: updateParams, success: true };
     } catch (error) {
-        console.log("Error while updating record:", key);
+        console.log("Error while updating record:", key, "Log:", error);
         return { query: updateParams, success: false };
     }
 }
