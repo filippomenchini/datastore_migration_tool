@@ -15,7 +15,8 @@ It is not recommended for use in production environments.
 ## Help
 
 ```shell
-datastore_migration [tableName] --keyField=[keyField1] --keyField=[keyField2] ... --keyField=[keyField(n)]
+datastore_migration [tableName] --keyField=[keyField1] --keyField=[keyField2]
+... --keyField=[keyField(n)]
 
 Options:
   --tableName  DynamoDB table to migrate.                              [string]
