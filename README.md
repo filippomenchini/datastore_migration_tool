@@ -27,4 +27,3 @@ Options:
 
 1. Unit tests
 2. Custom region
-3. Parallel table scan
