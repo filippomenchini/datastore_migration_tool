@@ -12,6 +12,7 @@
   "dependencies": {
     "@aws-sdk/client-dynamodb": "^3.154.0",
     "@aws-sdk/lib-dynamodb": "^3.154.0",
+    "@shelf/dynamodb-parallel-scan": "^3.3.0",
     "prompt-sync": "^4.2.0",
     "yargs": "^17.5.1"
   }
