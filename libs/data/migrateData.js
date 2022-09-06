@@ -6,9 +6,10 @@ async function updateRecords(tableName, keyFields, records) {
     return await Promise.all(results);
 }
 
-async function updateRecord(tableName, keyFields, record) {
+async function updateRecord(tableName, keyFields, record, operationType) {
     const key = getKeyObject(keyFields, record);
-    const updateParams = {
+
+    const addFieldsParams = {
         TableName: tableName,
         Key: key,
         UpdateExpression: "SET #version = :version, #lastChangedAt = :lastChangedAt",
@@ -21,13 +22,24 @@ async function updateRecord(tableName, keyFields, record) {
             "#lastChangedAt": "_lastChangedAt"
         }
     };
+
+    const removeFieldsParams = {
+        TableName: tableName,
+        Key: key,
+        UpdateExpression: "REMOVE #version, #lastChangedAt",
+        ExpressionAttributeNames: {
+            "#version": "_version",
+            "#lastChangedAt": "_lastChangedAt"
+        }
+    };
+
     try {
-        await ddbDocClient.send(new UpdateCommand(updateParams));
+        await ddbDocClient.send(new UpdateCommand(operationType === "ADD" ? addFieldsParams : removeFieldsParams));
         console.log("Record updated successfully:", key);
-        return { query: updateParams, success: true };
+        return { query: addFieldsParams, success: true };
     } catch (error) {
         console.log("Error while updating record:", key, "Log:", error);
-        return { query: updateParams, success: false };
+        return { query: addFieldsParams, success: false };
     }
 }
 
@@ -36,8 +48,8 @@ function getKeyObject(keyFields, record) {
     return key;
 }
 
-function migrateData(records) {
-    const newRecords = records.map(addRequiredFields);
+function migrateData(records, operationType) {
+    const newRecords = operationType === "ADD" ? records.map(addRequiredFields) : records.map(removeRequiredFields);
     return newRecords;
 }
 
@@ -45,6 +57,24 @@ function addRequiredFields(record) {
     let newRecord = addVersionField(record);
     newRecord = addLastChangedAt(record);
     return newRecord;
+}
+
+function removeRequiredFields(record) {
+    let newRecord = removeVersionField(record);
+    newRecord = removeLastChangedAt(record);
+    return newRecord;
+}
+
+function removeVersionField(record) {
+    if (!record.hasOwnProperty("_version")) return record;
+    delete record._version;
+    return record;
+}
+
+function removeLastChangedAt(record) {
+    if (!record.hasOwnProperty("_lastChangedAt")) return record;
+    delete record._lastChangedAt;
+    return record;
 }
 
 function addVersionField(record) {

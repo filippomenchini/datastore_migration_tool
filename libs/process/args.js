@@ -3,7 +3,11 @@ import { hideBin } from "yargs/helpers";
 
 const argv = yargs(hideBin(process.argv))
     .scriptName("datastore_migration")
-    .usage("$0 [tableName] --keyField=[keyField1] --keyField=[keyField2] ... --keyField=[keyField(n)]")
+    .usage("$0 [ADD or REMOVE] --tableName=[tableName] --keyField=[keyField1] --keyField=[keyField2] ... --keyField=[keyField(n)]")
+    .option('type', {
+        description: "Add or remove migration fields.",
+        type: 'string'
+    })
     .option('tableName', {
     description: "DynamoDB table to migrate.",
     type: 'string'})
@@ -15,11 +19,15 @@ const argv = yargs(hideBin(process.argv))
     .parse();
 
 function getTableNameFromArgs() {
-    return argv._[0];
+    return argv.tableName;
+}
+
+function getTypeFromArgs() {
+    return argv.type;
 }
 
 function getKeyFieldsFromArgs() {
     return argv.keyField;
 }
 
-export { getTableNameFromArgs, getKeyFieldsFromArgs };
+export { getTableNameFromArgs, getKeyFieldsFromArgs, getTypeFromArgs };
